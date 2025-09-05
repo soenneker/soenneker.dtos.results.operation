@@ -50,8 +50,7 @@ public class OperationResult
     public bool Failed => !Succeeded;
 
     [Pure]
-    public static OperationResult<TResponse> Success<TResponse>(TResponse value,
-        HttpStatusCode statusCode = HttpStatusCode.OK)
+    public static OperationResult<TResponse> Success<TResponse>(TResponse value, HttpStatusCode statusCode = HttpStatusCode.OK)
     {
         return new OperationResult<TResponse>
         {
