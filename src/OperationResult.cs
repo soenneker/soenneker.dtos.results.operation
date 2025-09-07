@@ -50,9 +50,9 @@ public class OperationResult
     public bool Failed => !Succeeded;
 
     [Pure]
-    public static OperationResult<TResponse> Success<TResponse>(TResponse value, HttpStatusCode statusCode = HttpStatusCode.OK)
+    public static OperationResult<T> Success<T>(T value, HttpStatusCode statusCode = HttpStatusCode.OK)
     {
-        return new OperationResult<TResponse>
+        return new OperationResult<T>
         {
             Value = value,
             StatusCode = (int)statusCode
@@ -60,9 +60,18 @@ public class OperationResult
     }
 
     [Pure]
-    public static OperationResult<TResponse> Fail<TResponse>(string title, string detail, HttpStatusCode statusCode)
+    public static OperationResult Success(HttpStatusCode statusCode = HttpStatusCode.OK)
     {
-        return new OperationResult<TResponse>
+        return new OperationResult
+        {
+            StatusCode = (int)statusCode
+        };
+    }
+
+    [Pure]
+    public static OperationResult<T> Fail<T>(string title, string detail, HttpStatusCode statusCode)
+    {
+        return new OperationResult<T>
         {
             StatusCode = (int)statusCode,
             Problem = new ProblemDetailsDto
@@ -72,5 +81,33 @@ public class OperationResult
                 Status = (int)statusCode
             }
         };
+    }
+
+    [Pure]
+    public static OperationResult Fail(string title, string detail, HttpStatusCode statusCode)
+    {
+        return new OperationResult
+        {
+            StatusCode = (int)statusCode,
+            Problem = new ProblemDetailsDto
+            {
+                Title = title,
+                Detail = detail,
+                Status = (int)statusCode
+            }
+        };
+    }
+
+    [Pure]
+    public static OperationResult FromProblem(ProblemDetailsDto problem, HttpStatusCode? statusCode = null)
+    {
+        var result = new OperationResult { Problem = problem };
+
+        if (statusCode == null)
+            result.StatusCode = problem.Status ?? 500;
+        else
+            result.StatusCode = (int)statusCode;
+
+        return result;
     }
 }
