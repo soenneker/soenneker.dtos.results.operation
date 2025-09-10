@@ -44,8 +44,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="Soenneker.Attributes.PublicOpenApiObject" Version="3.0.29" />
         <PackageReference Include="Soenneker.Dtos.ProblemDetails" Version="3.0.400" />
     </ItemGroup>
 </Project>
