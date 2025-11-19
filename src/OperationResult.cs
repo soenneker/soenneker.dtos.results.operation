@@ -97,17 +97,4 @@ public class OperationResult
             }
         };
     }
-
-    [Pure]
-    public static OperationResult FromProblem(ProblemDetailsDto problem, HttpStatusCode? statusCode = null)
-    {
-        var result = new OperationResult { Problem = problem };
-
-        if (statusCode == null)
-            result.StatusCode = problem.Status ?? 500;
-        else
-            result.StatusCode = (int)statusCode;
-
-        return result;
-    }
 }
