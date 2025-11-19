@@ -97,4 +97,26 @@ public class OperationResult
             }
         };
     }
+
+    [Pure]
+    public static OperationResult<T> Empty<T>(HttpStatusCode statusCode = HttpStatusCode.NoContent)
+    {
+        return new OperationResult<T>
+        {
+            StatusCode = (int)statusCode,
+            Value = default,
+            Problem = null
+        };
+    }
+
+    [Pure]
+    public static OperationResult Empty(HttpStatusCode statusCode = HttpStatusCode.NoContent)
+    {
+        return new OperationResult
+        {
+            StatusCode = (int)statusCode,
+            Value = null,
+            Problem = null
+        };
+    }
 }
