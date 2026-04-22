@@ -1,11 +1,10 @@
-﻿using Soenneker.Tests.Unit;
-using Xunit;
+using Soenneker.Tests.Unit;
 
 namespace Soenneker.Dtos.Results.Operation.Tests;
 
 public sealed class OperationResultTests : UnitTest
 {
-    [Fact]
+    [Test]
     public void Default()
     {
 
