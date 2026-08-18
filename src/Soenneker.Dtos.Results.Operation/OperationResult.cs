@@ -15,14 +15,14 @@ namespace Soenneker.Dtos.Results.Operation;
 public class OperationResult
 {
     /// <summary>
-    /// Gets a value indicating whether the operation completed successfully.
+    /// Indicates whether the operation completed without problem details. This convenience property is not serialized.
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
     public bool Succeeded => Problem is null;
 
     /// <summary>
-    /// Gets the HTTP status code associated with the operation result.
+    /// HTTP status code associated with the operation result.
     /// This value reflects the outcome of the operation, such as 200 for success or 400 for a client error.
     /// </summary>
     [JsonPropertyName("statusCode")]
@@ -30,7 +30,7 @@ public class OperationResult
     public int StatusCode { get; set; }
 
     /// <summary>
-    /// Gets the value returned when the operation succeeds.
+    /// Value returned when the operation succeeds.
     /// This property is <see langword="null"/> when the operation fails.
     /// </summary>
     [JsonPropertyName("value")]
@@ -38,7 +38,7 @@ public class OperationResult
     public object? Value { get; set; }
 
     /// <summary>
-    /// Gets the problem details describing the error when the operation fails.
+    /// Problem details describing the error when the operation fails.
     /// This property is <see langword="null"/> when the operation succeeds.
     /// </summary>
     [JsonPropertyName("problem")]
@@ -46,7 +46,7 @@ public class OperationResult
     public ProblemDetailsDto? Problem { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether failed.
+    /// Indicates whether the operation contains problem details. This convenience property is not serialized.
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]

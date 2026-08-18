@@ -6,8 +6,7 @@ using Soenneker.Dtos.ProblemDetails;
 namespace Soenneker.Dtos.Results.Operation;
 
 /// <summary>
-/// Represents the standardized outcome of an operation, containing either a successful result value
-/// or detailed error information in the form of a <see cref="ProblemDetailsDto"/>.
+/// Represents the standardized outcome of an operation with a strongly typed success value or machine-readable problem details.
 /// </summary>
 /// <typeparam name="T">
 /// The type of the successful result value returned by the operation.
@@ -16,7 +15,7 @@ namespace Soenneker.Dtos.Results.Operation;
 public sealed class OperationResult<T> : OperationResult
 {
     /// <summary>
-    /// Gets the value returned when the operation succeeds.
+    /// Strongly typed value returned when the operation succeeds.
     /// This property is <see langword="null"/> when the operation fails.
     /// </summary>
     [JsonPropertyName("value")]
