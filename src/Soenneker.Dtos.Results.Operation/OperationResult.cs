@@ -53,12 +53,12 @@ public class OperationResult
     public bool Failed => !Succeeded;
 
     /// <summary>
-    /// Executes the success operation.
+    /// Creates a successful result containing the supplied payload.
     /// </summary>
-    /// <typeparam name="T">The T type.</typeparam>
-    /// <param name="value">The value.</param>
-    /// <param name="statusCode">The status code.</param>
-    /// <returns>The result of the operation.</returns>
+    /// <typeparam name="T">Type of value handled by the operation result.</typeparam>
+    /// <param name="value">Payload carried by the successful result.</param>
+    /// <param name="statusCode">HTTP status code associated with the result.</param>
+    /// <returns>The resulting operation Result.</returns>
     [Pure]
     public static OperationResult<T> Success<T>(T value, HttpStatusCode statusCode = HttpStatusCode.OK)
     {
@@ -70,10 +70,10 @@ public class OperationResult
     }
 
     /// <summary>
-    /// Executes the success operation.
+    /// Creates a successful result containing the supplied payload.
     /// </summary>
-    /// <param name="statusCode">The status code.</param>
-    /// <returns>The result of the operation.</returns>
+    /// <param name="statusCode">HTTP status code associated with the result.</param>
+    /// <returns>The same builder instance, so additional classes or variants can be chained.</returns>
     [Pure]
     public static OperationResult Success(HttpStatusCode statusCode = HttpStatusCode.OK)
     {
@@ -84,13 +84,13 @@ public class OperationResult
     }
 
     /// <summary>
-    /// Executes the fail operation.
+    /// Returns the value produced by fail.
     /// </summary>
-    /// <typeparam name="T">The T type.</typeparam>
-    /// <param name="title">The title.</param>
-    /// <param name="detail">The detail.</param>
-    /// <param name="statusCode">The status code.</param>
-    /// <returns>The result of the operation.</returns>
+    /// <typeparam name="T">Type of value handled by the operation result.</typeparam>
+    /// <param name="title">Page title, when available.</param>
+    /// <param name="detail">Detail for the fail operation.</param>
+    /// <param name="statusCode">HTTP status code associated with the result.</param>
+    /// <returns>The resulting operation Result.</returns>
     [Pure]
     public static OperationResult<T> Fail<T>(string title, string detail, HttpStatusCode statusCode)
     {
@@ -107,12 +107,12 @@ public class OperationResult
     }
 
     /// <summary>
-    /// Executes the fail operation.
+    /// Returns the value produced by fail.
     /// </summary>
-    /// <param name="title">The title.</param>
-    /// <param name="detail">The detail.</param>
-    /// <param name="statusCode">The status code.</param>
-    /// <returns>The result of the operation.</returns>
+    /// <param name="title">Page title, when available.</param>
+    /// <param name="detail">Detail for the fail operation.</param>
+    /// <param name="statusCode">HTTP status code associated with the result.</param>
+    /// <returns>The same builder instance, so additional classes or variants can be chained.</returns>
     [Pure]
     public static OperationResult Fail(string title, string detail, HttpStatusCode statusCode)
     {
@@ -129,11 +129,11 @@ public class OperationResult
     }
 
     /// <summary>
-    /// Executes the empty operation.
+    /// Returns the value produced by empty.
     /// </summary>
-    /// <typeparam name="T">The T type.</typeparam>
-    /// <param name="statusCode">The status code.</param>
-    /// <returns>The result of the operation.</returns>
+    /// <typeparam name="T">Type of value handled by the operation result.</typeparam>
+    /// <param name="statusCode">HTTP status code associated with the result.</param>
+    /// <returns>The resulting operation Result.</returns>
     [Pure]
     public static OperationResult<T> Empty<T>(HttpStatusCode statusCode = HttpStatusCode.NoContent)
     {
@@ -146,10 +146,10 @@ public class OperationResult
     }
 
     /// <summary>
-    /// Executes the empty operation.
+    /// Returns the value produced by empty.
     /// </summary>
-    /// <param name="statusCode">The status code.</param>
-    /// <returns>The result of the operation.</returns>
+    /// <param name="statusCode">HTTP status code associated with the result.</param>
+    /// <returns>The same builder instance, so additional classes or variants can be chained.</returns>
     [Pure]
     public static OperationResult Empty(HttpStatusCode statusCode = HttpStatusCode.NoContent)
     {
