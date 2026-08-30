@@ -5,7 +5,7 @@
 
 # Soenneker.Dtos.Results.Operation
 
-Represents the standardized outcome of an operation, containing either a successful result value or detailed error information in the form of a `ProblemDetailsDto`.
+A result envelope for service and API operations. It carries an HTTP-style status code plus either a typed success value or problem details, with support for `System.Text.Json` and Newtonsoft.Json.
 
 ## Install
 
@@ -13,22 +13,41 @@ Represents the standardized outcome of an operation, containing either a success
 dotnet add package Soenneker.Dtos.Results.Operation
 ```
 
-## What you get
+## Create results
 
-- `OperationResult` — Represents the standardized outcome of an operation, containing either a successful result value or detailed error information in the form of a `ProblemDetailsDto`.
-- `OperationResult<T>` — Represents the standardized outcome of an operation with a strongly typed success value or machine-readable problem details.
+```csharp
+using System.Net;
+using Soenneker.Dtos.Results.Operation;
 
-## API at a glance
+OperationResult<OrderDto> created = OperationResult.Success(
+    order,
+    HttpStatusCode.Created);
 
-| API | What it does | Result / important behavior |
-| --- | --- | --- |
-| `OperationResult.Succeeded` | Indicates whether the operation completed without problem details. This convenience property is not serialized. | Indicates whether the operation completed without problem details. This convenience property is not serialized. |
-| `OperationResult.StatusCode` | HTTP status code associated with the operation result. This value reflects the outcome of the operation, such as 200 for success or 400 for a client error. | HTTP status code associated with the operation result. This value reflects the outcome of the operation, such as 200 for success or 400 for a client error. |
-| `OperationResult.Value` | Value returned when the operation succeeds. This property is `null` when the operation fails. | Value returned when the operation succeeds. This property is `null` when the operation fails. |
-| `OperationResult.Problem` | Problem details describing the error when the operation fails. This property is `null` when the operation succeeds. | Problem details describing the error when the operation fails. This property is `null` when the operation succeeds. |
-| `OperationResult.Failed` | Indicates whether the operation contains problem details. This convenience property is not serialized. | Indicates whether the operation contains problem details. This convenience property is not serialized. |
-| `OperationResult.Success(value, statusCode)` | Creates a successful result containing the supplied payload. | Returns `OperationResult<T>`. |
-| `OperationResult.Success(statusCode)` | Creates a successful result containing the supplied payload. | The same builder instance, so additional classes or variants can be chained. |
-| `OperationResult.Fail(title, detail, statusCode)` | Returns the value produced by fail. | Returns `OperationResult<T>`. |
-| `OperationResult.Empty(statusCode)` | Returns the value produced by empty. | Returns `OperationResult<T>`. |
-| `OperationResult<T>.Value` | Strongly typed value returned when the operation succeeds. This property is `null` when the operation fails. | Strongly typed value returned when the operation succeeds. This property is `null` when the operation fails. |
+OperationResult<OrderDto> missing = OperationResult.Fail<OrderDto>(
+    "Order not found",
+    "No order exists with id 42.",
+    HttpStatusCode.NotFound);
+
+OperationResult noContent = OperationResult.Empty();
+```
+
+Use the generic overloads when the caller needs a strongly typed `Value`. Use the non-generic overloads for commands with no response body.
+
+## Consume a result
+
+```csharp
+if (result.Succeeded)
+{
+    OrderDto? order = result.Value;
+}
+else
+{
+    Console.WriteLine(result.Problem?.Detail);
+}
+```
+
+`Succeeded` means `Problem` is null; `Failed` is its inverse. Neither property is serialized, and neither examines `StatusCode` or `Value`. A default instance therefore counts as successful even though its status code is `0` and its value is null.
+
+The factory methods keep `StatusCode` and `Problem.Status` aligned for failures. The public properties remain mutable, so callers can create contradictory states if they bypass the factories. `StatusCode` is payload metadata only and does not set an actual HTTP response status.
+
+`Empty<T>()` defaults to 204 and carries a default value. Null serialization follows the options configured for the selected serializer.
