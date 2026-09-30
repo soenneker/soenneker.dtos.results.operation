@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-using Newtonsoft.Json;
 using Soenneker.Attributes.PublicOpenApiObject;
 using Soenneker.Dtos.ProblemDetails;
 
@@ -19,6 +18,5 @@ public sealed class OperationResult<T> : OperationResult
     /// This property is <see langword="null"/> when the operation fails.
     /// </summary>
     [JsonPropertyName("value")]
-    [JsonProperty("value")]
     public new T? Value { get; set; }
 }

@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Net;
 using System.Text.Json.Serialization;
-using Newtonsoft.Json;
 using Soenneker.Attributes.PublicOpenApiObject;
 using Soenneker.Dtos.ProblemDetails;
 
@@ -18,7 +17,6 @@ public class OperationResult
     /// Indicates whether the operation completed without problem details. This convenience property is not serialized.
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
-    [Newtonsoft.Json.JsonIgnore]
     public bool Succeeded => Problem is null;
 
     /// <summary>
@@ -26,7 +24,6 @@ public class OperationResult
     /// This value reflects the outcome of the operation, such as 200 for success or 400 for a client error.
     /// </summary>
     [JsonPropertyName("statusCode")]
-    [JsonProperty("statusCode")]
     public int StatusCode { get; set; }
 
     /// <summary>
@@ -34,7 +31,6 @@ public class OperationResult
     /// This property is <see langword="null"/> when the operation fails.
     /// </summary>
     [JsonPropertyName("value")]
-    [JsonProperty("value")]
     public object? Value { get; set; }
 
     /// <summary>
@@ -42,14 +38,12 @@ public class OperationResult
     /// This property is <see langword="null"/> when the operation succeeds.
     /// </summary>
     [JsonPropertyName("problem")]
-    [JsonProperty("problem")]
     public ProblemDetailsDto? Problem { get; set; }
 
     /// <summary>
     /// Indicates whether the operation contains problem details. This convenience property is not serialized.
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
-    [Newtonsoft.Json.JsonIgnore]
     public bool Failed => !Succeeded;
 
     /// <summary>

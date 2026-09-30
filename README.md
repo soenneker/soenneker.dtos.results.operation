@@ -5,7 +5,7 @@
 
 # Soenneker.Dtos.Results.Operation
 
-A result envelope for service and API operations. It carries an HTTP-style status code plus either a typed success value or problem details, with support for `System.Text.Json` and Newtonsoft.Json.
+A result envelope for service and API operations. It carries an HTTP-style status code plus either a typed success value or problem details, with support for `System.Text.Json`.
 
 ## Install
 
