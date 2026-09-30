@@ -10,7 +10,7 @@ namespace Soenneker.Dtos.Results.Operation.Tests;
 public sealed class OperationResultTests : UnitTest
 {
     [Test]
-    public async Task Generic_success_serializes_one_typed_value_with_both_serializers()
+    public async ValueTask Generic_success_serializes_one_typed_value_with_both_serializers()
     {
         OperationResult<string> result = OperationResult.Success("ready", HttpStatusCode.Created);
 
