@@ -3,13 +3,14 @@ using System.Text.Json;
 using System.Linq;
 using System.Threading.Tasks;
 using Soenneker.Tests.Unit;
+using System.Threading;
 
 namespace Soenneker.Dtos.Results.Operation.Tests;
 
 public sealed class OperationResultTests : UnitTest
 {
     [Test]
-    public async ValueTask Generic_success_serializes_one_typed_value_with_system_text_json()
+    public async ValueTask Generic_success_serializes_one_typed_value_with_system_text_json(CancellationToken cancellationToken)
     {
         OperationResult<string> result = OperationResult.Success("ready", HttpStatusCode.Created);
 
