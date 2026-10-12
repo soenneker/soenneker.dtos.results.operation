@@ -83,10 +83,36 @@ jobs:
       - name: Log in to NuGet
         uses: NuGet/login@v1
         id: nuget-login
+        continue-on-error: true
+        with:
+          user: soenneker
+
+      - name: Wait before second NuGet login attempt
+        if: steps.nuget-login.outcome == 'failure'
+        run: sleep 15
+
+      - name: Log in to NuGet (attempt 2)
+        if: steps.nuget-login.outcome == 'failure'
+        uses: NuGet/login@v1
+        id: nuget-login-retry
+        continue-on-error: true
+        with:
+          user: soenneker
+
+      - name: Wait before final NuGet login attempt
+        if: steps.nuget-login-retry.outcome == 'failure'
+        run: sleep 30
+
+      - name: Log in to NuGet (attempt 3)
+        if: steps.nuget-login-retry.outcome == 'failure'
+        uses: NuGet/login@v1
+        id: nuget-login-final
         with:
           user: soenneker
 
       - name: Publish to NuGet
+        env:
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY || steps.nuget-login-retry.outputs.NUGET_API_KEY || steps.nuget-login-final.outputs.NUGET_API_KEY }}
         shell: bash
         run: |
           set -euo pipefail
@@ -97,7 +123,7 @@ jobs:
             set +e
             dotnet nuget push ./artifacts/*.nupkg \
               --source "https://api.nuget.org/v3/index.json" \
-              --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" \
+              --api-key "$NUGET_API_KEY" \
               --skip-duplicate 2>&1 | tee "$output_file"
             exit_code=${PIPESTATUS[0]}
             set -e
