@@ -81,38 +81,47 @@ jobs:
             --output ./artifacts
 
       - name: Log in to NuGet
-        uses: NuGet/login@v1
         id: nuget-login
-        continue-on-error: true
-        with:
-          user: soenneker
+        shell: bash
+        timeout-minutes: 6
+        env:
+          NUGET_USER: soenneker
+        run: |
+          set -euo pipefail
 
-      - name: Wait before second NuGet login attempt
-        if: steps.nuget-login.outcome == 'failure'
-        run: sleep 15
+          oidc_response="$(curl --silent --show-error --fail \
+            --connect-timeout 30 \
+            --max-time 30 \
+            --header "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=https%3A%2F%2Fwww.nuget.org")"
 
-      - name: Log in to NuGet (attempt 2)
-        if: steps.nuget-login.outcome == 'failure'
-        uses: NuGet/login@v1
-        id: nuget-login-retry
-        continue-on-error: true
-        with:
-          user: soenneker
+          oidc_token="$(jq -er '.value | strings | select(length > 0)' <<< "$oidc_response")"
+          echo "::add-mask::$oidc_token"
 
-      - name: Wait before final NuGet login attempt
-        if: steps.nuget-login-retry.outcome == 'failure'
-        run: sleep 30
+          body="$(jq -nc --arg username "$NUGET_USER" \
+            '{username: $username, tokenType: "ApiKey"}')"
 
-      - name: Log in to NuGet (attempt 3)
-        if: steps.nuget-login-retry.outcome == 'failure'
-        uses: NuGet/login@v1
-        id: nuget-login-final
-        with:
-          user: soenneker
+          echo "Requesting NuGet publishing key (timeout: 300 seconds)..."
+          started=$SECONDS
+
+          response="$(curl --silent --show-error --fail \
+            --connect-timeout 30 \
+            --max-time 300 \
+            --request POST \
+            --header "Authorization: Bearer $oidc_token" \
+            --header "Content-Type: application/json" \
+            --user-agent "nuget/login-action" \
+            --data "$body" \
+            https://www.nuget.org/api/v2/token)"
+
+          api_key="$(jq -er '.apiKey | strings | select(length > 0)' <<< "$response")"
+          echo "::add-mask::$api_key"
+          echo "NUGET_API_KEY=$api_key" >> "$GITHUB_OUTPUT"
+          echo "NuGet login succeeded in $((SECONDS - started)) seconds."
 
       - name: Publish to NuGet
         env:
-          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY || steps.nuget-login-retry.outputs.NUGET_API_KEY || steps.nuget-login-final.outputs.NUGET_API_KEY }}
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
         shell: bash
         run: |
           set -euo pipefail
