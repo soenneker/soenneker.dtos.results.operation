@@ -13,7 +13,6 @@ on:
   workflow_dispatch:
 
 permissions:
-  id-token: write
   contents: write
   packages: write
 
@@ -69,74 +68,10 @@ jobs:
             --no-restore \
             --output ./artifacts
 
-      - name: Log in to NuGet
-        id: nuget-login
-        shell: bash
-        timeout-minutes: 6
-        env:
-          NUGET_USER: soenneker
-        run: |
-          set -euo pipefail
-
-          oidc_response="$(curl --silent --show-error --fail \
-            --connect-timeout 30 \
-            --max-time 30 \
-            --header "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=https%3A%2F%2Fwww.nuget.org")"
-
-          oidc_token="$(jq -er '.value | strings | select(length > 0)' <<< "$oidc_response")"
-          echo "::add-mask::$oidc_token"
-
-          body="$(jq -nc --arg username "$NUGET_USER" \
-            '{username: $username, tokenType: "ApiKey"}')"
-
-          echo "Requesting NuGet publishing key (timeout: 300 seconds)..."
-          started=$SECONDS
-          response_dir="$(mktemp -d)"
-          trap 'rm -rf "$response_dir"' EXIT
-
-          curl_exit=0
-          http_status="$(curl --silent --show-error \
-            --connect-timeout 30 \
-            --max-time 300 \
-            --dump-header "$response_dir/headers" \
-            --output "$response_dir/body" \
-            --write-out '%{http_code}' \
-            --request POST \
-            --header "Authorization: Bearer $oidc_token" \
-            --header "Content-Type: application/json" \
-            --user-agent "nuget/login-action" \
-            --data "$body" \
-            https://www.nuget.org/api/v2/token)" || curl_exit=$?
-
-          api_key="$(jq -er '.apiKey | strings | select(length > 0)' "$response_dir/body" 2>/dev/null)" || api_key=""
-          if [[ -n "$api_key" ]]; then
-            echo "::add-mask::$api_key"
-          fi
-
-          echo "NuGet token exchange: HTTP $http_status, curl exit $curl_exit, elapsed $((SECONDS - started)) seconds."
-          if [[ "$curl_exit" -ne 0 || "$http_status" != "200" || -z "$api_key" ]]; then
-            echo "::group::NuGet token exchange response"
-            # Treat response text as data, not GitHub workflow commands.
-            stop_token="$(cat /proc/sys/kernel/random/uuid)"
-            echo "::stop-commands::$stop_token"
-            echo "Response headers:"
-            cat "$response_dir/headers" 2>/dev/null || true
-            printf '\nResponse body:\n'
-            cat "$response_dir/body" 2>/dev/null || true
-            printf '\n::%s::\n' "$stop_token"
-            echo "::endgroup::"
-            echo "::error::NuGet token exchange failed. See the response above."
-            exit 1
-          fi
-
-          echo "NUGET_API_KEY=$api_key" >> "$GITHUB_OUTPUT"
-          echo "NuGet login succeeded in $((SECONDS - started)) seconds."
-
       - name: Publish to NuGet
         uses: soenneker/nuget-resilient-publish@v4
         with:
-          api-key: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+          api-key: ${{ secrets.nuget__token }}
           packages: 'artifacts/*.nupkg'
 
       - name: Publish to GitHub Packages
