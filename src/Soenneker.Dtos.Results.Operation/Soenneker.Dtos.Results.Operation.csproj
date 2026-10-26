@@ -45,6 +45,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Soenneker.Dtos.ProblemDetails" Version="11.0.482" />
+        <PackageReference Include="Soenneker.Dtos.ProblemDetails" Version="11.0.483" />
     </ItemGroup>
 </Project>
